@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shxt.back.menu.mapper.MenuMapper" >
+    <resultMap id="BaseResultMap" type="com.shxt.back.menu.model.Menu" >
+        <id column="menu_id" property="menu_id" jdbcType="INTEGER" />
+        <result column="menu_name" property="menu_name" jdbcType="VARCHAR" />
+        <result column="meng_url" property="meng_url" jdbcType="VARCHAR" />
+        <result column="father_menu" property="father_menu" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="menu_columns" >
+        menu_id, menu_name, meng_url, father_menu
+    </sql>
+    <select id="load" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select 
+        <include refid="menu_columns" />
+        from menu
+        where menu_id = #{menu_id,jdbcType=INTEGER}
+    </select>
+    <delete id="delete" parameterType="java.lang.Integer" >
+        delete from menu
+        where menu_id = #{menu_id,jdbcType=INTEGER}
+    </delete>
+    <insert id="add" parameterType="com.shxt.back.menu.model.Menu" >
+        insert into menu
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="menu_id != null" >
+                menu_id,
+            </if>
+            <if test="menu_name != null" >
+                menu_name,
+            </if>
+            <if test="meng_url != null" >
+                meng_url,
+            </if>
+            <if test="father_menu != null" >
+                father_menu,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="menu_id != null" >
+                #{menu_id,jdbcType=INTEGER},
+            </if>
+            <if test="menu_name != null" >
+                #{menu_name,jdbcType=VARCHAR},
+            </if>
+            <if test="meng_url != null" >
+                #{meng_url,jdbcType=VARCHAR},
+            </if>
+            <if test="father_menu != null" >
+                #{father_menu,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="com.shxt.back.menu.model.Menu" >
+        update menu
+        <set >
+            <if test="menu_name != null" >
+                menu_name = #{menu_name,jdbcType=VARCHAR},
+            </if>
+            <if test="meng_url != null" >
+                meng_url = #{meng_url,jdbcType=VARCHAR},
+            </if>
+            <if test="father_menu != null" >
+                father_menu = #{father_menu,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where menu_id = #{menu_id,jdbcType=INTEGER}
+    </update>
+    <select id="noList" parameterType="integer" resultMap="BaseResultMap">
+    	select * from menu where menu_id not in (select fk_menu_id from rlm where fk_role_id=#{fk_role_id}) and father_menu is not null
+    </select>
+    <select id="fatherList" parameterType="integer" resultMap="BaseResultMap">
+    	select * from menu where menu_id in (select father_menu from menu where menu_id in (select fk_menu_id from rlm where fk_role_id=#{fk_role_id}))
+    </select>
+</mapper>
